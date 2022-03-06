@@ -2,7 +2,7 @@
 
 * [介绍](README.md)
 * [Go面试题](go/README.md)
-    * channel
+    * [channel](go/channel/README.md)
         * [1.什么是 CSP](go/channel/1-什么是 CSP.md)
         * [2.channel 底层的数据结构是什么](go/channel/2-channel 底层的数据结构是什么.md)
         * [3.向 channel 发送数据的过程是怎样的](go/channel/3-向 channel 发送数据的过程是怎样的.md)
@@ -66,6 +66,7 @@
         * [1.数组和切片有什么异同](go/slice/1-数组和切片有什么异同.md)
         * [2.切片的容量是怎样增长的](go/slice/2-切片的容量是怎样增长的.md)
         * [3.切片作为函数参数](go/slice/3-切片作为函数参数.md)
+        * [4.Go语言切片面试真题8连问](go/slice/4-Go语言切片面试真题8连问.md)
     * runtime
         * goroutine 调度器
             * [1.goroutine和线程的区别](go/sched/1-goroutine和线程的区别.md)
@@ -89,3 +90,4 @@
             * [3.垃圾回收的优化问题](go/memgc/3-垃圾回收的优化问题.md)
             * [4.历史及演进](go/memgc/4-历史及演进.md)
             * [5.总结](go/memgc/5-总结.md)
+* [Kafka面试题](kafka/README.md)
