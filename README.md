@@ -3,7 +3,7 @@
     <a href="https://github.com/xmcy0011/interview-golang"> <img src="https://badgen.net/github/forks/xmcy0011/interview-golang?icon=github&color=4ab8a1"></a>
 </div>
 
-# GO面试复习指南
+# Go面试复习指南
 
 列举Golang后端常见面试和笔试题，资料来自于各种书籍、网站和文章分享等，每一节的文末有给出。
 
