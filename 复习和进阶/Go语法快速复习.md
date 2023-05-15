@@ -1,0 +1,394 @@
+# Go语法快速复习
+
+本章内容主要是来自于本人实践以及部分书籍（见文末），适合有 C/C++、Java、Go或其他语言基础的读者复习Go的语法。
+
+## 程序结构
+
+### Hello World
+
+Go语言的基础组成有6个部分：包声明、 引入包、函数、变量、语句&表达式和注释等
+
+以下是一个最基础的Go程序：
+```go
+package main
+
+import "fmt"
+
+func main() {
+   // 这是我的第一个go程序
+   fmt.Println("Hello, World!")  
+}
+```
+
+Go是静态语言，运行前需要编译，自 `Go1.5` 以后，Go编译器完成了自举（早期使用GCC编译器），它的名称就叫 `go`：
+
+```bash
+$ go build -o "main"
+$ ./main
+```
+
+当然，我们也可以使用 `go run` 来一键完成编译和运行程序：
+
+```go
+$ go run main.go
+```
+
+### 包和gomod
+
+包的常见注意事项如下：
+- Go中的包可以理解为 C++中的namespace，Java中的package
+- 通过 `package` 声明，通常建议文件目录名和包名保持一致
+- `main` 包特殊，是程序的入口
+- 一个目录下所有go文件的包名必须一致，否则编译报错
+- 包只能单向依赖，go在编译时会进行检查，如果循环依赖则导致报错
+
+现在 Go主流的依赖管理工具是 gomod，我们可以创建自己的工具库上传到github以被任何人使用，此时要注意模块名要带上你自己的github地址：
+
+```go
+$ go mod init github.com/xmcy0011/my-kratos
+```
+
+更多关于 gomod的信息请参考：[Go Modules Reference](https://go.dev/ref/mod#introduction)
+
+### 变量
+
+go是强类型语言，使用 var 声明变量并自动初始，省略类型时自动推导。在函数内的局部变量，推荐使用短变量声明操作符 `:=` 来声明和初始化。
+
+```go
+var count int      // 方式一：定义变量，通常出现于全局变量声明中
+var name = "jake"  // 方式二：省略类型，则自动推导
+person := Person{} // 方式三：局部变量可以使用 := 快捷声明初始化变量
+
+// 方式四：一次性定义多个变量
+var (
+  x int 
+  y int
+)
+
+var a, b int = 1, 2        // 方式五：a的类型为int
+a, b := 1, 2               // 方式六：连续声明并初始化2个局部变量
+func Add(a, b int, c float32) int {}  // 方式七：函数参数类型相同时，可省略前一个参数类型
+```
+
+注意Go中未使用的局部变量会导致编译错误，实际工作中各种IDE格式化时会自动清理，较小概率出现在笔试题中。
+
+### 全局变量
+
+注意Go是同时支持面向过程和面向对象编程的，go的全局变量直接放在文件中。和java语言相比，不需要放在Class内。和C++相比，不需要引入额外的关键词比如 `const static` 等。
+
+```go
+// calc.go
+const MyError = errors.New("this is my error") // 全局常量
+var NumberOfUsers = atomic.Int32{}             // 全局变量，import "sync/atomic"
+
+func NewUser() *User{
+  return &User{}
+}
+```
+
+### 变量逃逸
+
+`闭包` 会造成变量逃逸，即变量的分配由栈变成了堆，这也就是所谓的逃逸分析（escape analysis）。
+```go
+func test(x int) func() {  
+   return func() { fmt.Println(x) }  
+}  
+  
+func main() {  
+   f := test(100)  
+   f()  
+}
+```
+
+编译：
+```bash
+$ go build -gcflags="-m -l" # 禁止函数内联且输出优化信息
+
+./closure_func.go:31:9: func literal escapes to heap
+./closure_func.go:31:29: ... argument does not escape
+./closure_func.go:31:30: x escapes to heap # x最终在堆上分配
+```
+
+另外返回 `局部变量指针` 也会在堆上分配，当你通过go编译选项 `-gcflags "-l"` 禁止函数内联（inline）时，当然通常情况下不会这么干😊：
+```go
+func test() *int {
+  a := 100
+  return &a
+}
+```
+
+更多关于逃逸分析的内容，请参考 《Go语言学习笔记第四章》或这篇文章：https://appliedgo.com/blog/how-to-do-escape-analysis
+
+### 常量
+
+常量使用 `const` 声明，语法和 var 变量声明类似，不过要注意的是常量声明时可省略值和类型：
+
+```go
+const x int32 = 1 // 常量
+
+const (  
+   s = "abc"  
+   y              // 省略，类型和值保持和上一个 s 一致
+)  
+  
+func main() {  
+   fmt.Println(x, s, y)  
+}
+```
+
+输出：
+
+```bash
+1 abc abc
+```
+
+### 枚举iota
+
+Go没有 `enum` 关键字，而是通过 `const` 和 `iota` 自增标志符实现枚举，不过由于 `iota` 的自增规则会让初学者很容易迷糊，一旦出现在笔试题中，大概率会答错。我们只要记住，iota每次出现都会自增一次即可分辨。
+
+```go
+const (
+  x = iota // 0, int类型
+  y        // 1, 即y = iota，0+1=1
+  z        // 2, 即z = iota, 1+1=2
+)
+
+const (
+  _ = iota              // 0
+  KB = 1 << (10 * iota) // 1 << (10 * 1), 1024
+  MB                    // 1 << (10 * 2), 即MB = 1 << (10 * iota), 1024*1024
+)
+```
+
+iota可以中断自增，但是恢复时需要显示指定且自增值包含跳过的行数：
+
+```go
+const (
+  a = iota // 0
+  b        // 1, 即b = iota, 0+0=1
+  c = 100  // 100
+  d        // 100（d省略时，复制上一个值的类型和值，也就是d=100）
+  e = iota // 4（显示回复时，自增值包含跳过的2行，所以为1+2+1=4）
+  f        // 5
+)
+```
+
+iota默认为int类型，我们也可以自定义类型，如果枚举是非数值类型时，无法使用iota：
+
+```go
+type Animal int  
+  
+// 可自定义类型  
+const (  
+   Cat Animal = iota  
+   Dog                   // 是数值类型，可省略
+)  
+  
+type MsgType string  
+  
+// 也可以是其他类型，比如字符串  
+const (  
+   Txt   MsgType = "txt"  
+   Video MsgType = "video"  
+   Img           = "img" // 此时不能省略类型，否则变成string类型  
+)
+
+func main() {  
+   fmt.Printf("%T: %v - %T: %v \n", Cat, Cat, Dog, Dog)  
+   fmt.Printf("%T: %v - %T: %v - %T: %v \n", Txt, Txt, Video, Video, Img, Img)  
+}
+```
+
+输出：
+
+```bash
+main.Animal: 0 - main.Animal: 1 
+main.MsgType: txt - main.MsgType: video - string: img 
+```
+
+### 指针
+
+指针使用 `*T` 方式声明，它的值是一个变量的内存地址（常量在编译阶段展开，故无法获取地址），使用 `& 取地址操作符` 获取变量的内存地址，使用 `* 解引用操作符` 获取或更改变量的值。
+
+```go
+var p *int = nil  // 声明*int指针，32位系统4字节，64位系统则是8字节
+var x = 1         // int变量
+p = &x            // &操作符取x的内存地址，赋值给指针p
+
+fmt.Println(*p, x) // 1 1，*解引用，此时为左值，则输出变量的值
+*p = 2             // 等价于 x = 2，此时为右值，故可以改变变量的值
+fmt.Println(*p, x) // 2 2
+```
+
+看完上面的代码，我们也可以理解 p 就是x的一个别名，这样可能会更好理解一些，既然是别名那么就可以起无数个。
+
+因为只要保存一个内存地址，所以只需要使用数值就可以，Go中指针变量的大小在32位系统上是4字节，64位系统则是8字节：
+
+```go
+func main() {  
+   // Go会为我们自动初始化指针为零值，故不需要担心野指针问题
+   var p *int 
+   fmt.Println(unsafe.Sizeof(p))  // MacbookPro上输出8
+}
+```
+
+Go中函数传参统一使用值传递（复制一份），如果入参结构体比较大，出于性能考虑，我们不希望复制结构体以避免额外的内存复制开销时，可以改成指针方式传参，复制一个8字节指针和N字节结构体，内存开销显然不在一个量级。
+
+```go
+func main() {  
+   add := func(d Device) {
+      // d被复制一份，所以这里的d和外面的d不是同一个。
+      // 打印结构体地址需要使用 %p，否则默认使用 %v 格式化输出整个结构体的值
+      fmt.Printf("%p\n", &d)  
+   }  
+   d := Device{"1", "d1"}  
+   fmt.Printf("%p\n", &d)  
+   add(d)  
+  
+   addByPointer := func(d *Device) {  
+      // 传指针则可读写，到底是拷贝一份还是传指针值得仔细考虑
+      d.name = "d2"  
+   }  
+   addByPointer(&d)  
+   fmt.Println(d)  
+}
+```
+
+输出：
+
+```bash
+0xc000062020
+0xc000062040
+{1 d2}
+```
+
+在实际项目中，我们可能会返回局部变量的地址，这是非常安全的，go会通过逃逸分析帮我们延长局部变量的生命周期或者直接内联代码：
+
+```go
+package main  
+  
+import "fmt"  
+  
+var p = f()  
+  
+func f() *int {  
+   v := 1  
+   return &v  
+}  
+  
+func main() {  
+   fmt.Println(p)  
+}
+```
+
+编译下，可以看到 v 在堆上分配(moved to heap: v)，所以 `f()` 结束后，v其实并没有被回收 ：
+
+```bash
+$ go build -gcflags="-m"
+# goexample/15_go_syntax/glob
+./glob.go:7:6: can inline f
+./glob.go:12:6: can inline main
+./glob.go:13:13: inlining call to fmt.Println
+./glob.go:5:10: inlining call to f
+./glob.go:8:2: moved to heap: v
+./glob.go:13:13: ... argument does not escape
+./glob.go:5:10: moved to heap: v
+```
+
+另外，Go中的指针相对于 C/C++ `不支持运算（+、-、++、--）` 和`类型转换`，但是支持比较，如果2个指针指向同一个变量，则这2个指针相等：
+
+```go
+num1, num2 := 6, 4  
+pt1 := &num1  
+pt2 := &num1  
+pt3 := &num2  
+  
+//只有指向同一个变量，两个指针才相等  
+fmt.Printf("%v %v\n", pt1 == pt2, pt1 == pt3) // true false
+```
+
+PS：unsafe.Pointer转化指针后可进行加减操作，但是可能会造成非法访问。
+
+Go的指针设计，再配合垃圾回收、逃逸分析和自动初始化零值等机制，在 C/C++ 编程中各种 野指针、指针悬空和访问已释放的对象等问题都不复存在，大幅度提升了程序开发体验。
+
+## 表达式
+
+### 保留字
+
+```txt
+break default func interface select
+case  defer go map struct
+chan  else goto package switch
+const fallthrough if range type
+continue for import return var
+```
+
+### 运算符
+
+```txt
++ & += &= && == != ( )
+- | -= |= || < <= [ ]
+* ^ *= ^= <- > >= { }
+/ << /= <<= ++ = := , ;
+% >> %= >>= -- ! ... . :
+&^ &^=
+```
+
+和其他语言的差异：
+- `bit clear` 位运算符(AND NOT)是Go特有的，其形式为 `a &^ b`  
+- Go中自增和自减不再是运算符，只能作为独立语句，独占一行，相比C/C++也不支持运算符重载
+- Go没有 "~"，取反运算使用 "^"
+- 支持 `字面量` 初始化
+
+### 控制流程
+
+#### if
+
+```go
+x := 0  
+if x > 0 {  
+   // ...  
+} else if x < 0 {  
+   // ...  
+} else {  
+   // ...  
+}
+
+// 支持初始化语句
+if _, err := strconv.Atoi("sd"); err != nil {  
+}
+```
+
+#### for
+
+Go中没有while循环，do while循环等，统一使用 for 实现。
+
+```go
+// 最常见的循环
+for i := 0; i < 3; i++ {
+}
+
+// 类似 while x < 10 或 for ; x < 10; x++ {}
+for x < 10 {
+	x++
+}
+
+// 相当于 while true
+for {
+	if x > 10 {
+		break
+	}
+}
+```
+
+#### for range
+
+Go提供了 `for range` 表达式支持，可以方便的遍历切片、channel、map等
+
+## 类型
+
+## 鸣谢
+
+- [《The Go Programming Language》](https://book.douban.com/subject/26337545/)
+- [《Go语言学习笔记》](https://book.douban.com/subject/26832468/)
+- [《Go语言设计与实现》](https://book.douban.com/subject/35635836/)
