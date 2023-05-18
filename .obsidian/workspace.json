@@ -1,0 +1,190 @@
+{
+  "main": {
+    "id": "a7e9d7da99d486dd",
+    "type": "split",
+    "children": [
+      {
+        "id": "ac4a7bb17ad9c6a7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f7fc08341f47a835",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a74569456ca874ca",
+    "type": "split",
+    "children": [
+      {
+        "id": "4c83b0c32b1b447e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "548263daeee46053",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "bc5c4ee64a304e50",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "c65c402039b9197e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "d408fa02a429f0b7",
+    "type": "split",
+    "children": [
+      {
+        "id": "bb75fd1f7feb0626",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a909e93d1c7e9e21",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "b1199e8412b7b726",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "650d39293a3f92c2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "075b5a5812a2b950",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {}
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "f7fc08341f47a835",
+  "lastOpenFiles": [
+    "非技术类面试题.md",
+    "复习和进阶/Go语法快速复习.html",
+    "复习和进阶",
+    "search_index.json",
+    "index.html",
+    "go面试题/assets/slice-gc-delete.jpg",
+    "go面试题/assets/nil-slice.png",
+    "go面试题/面向对象.html",
+    "go面试题/标准库.html",
+    "go面试题/并发编程.html",
+    "go面试题/数据结构.html",
+    "go面试题/基础语法.md",
+    "go面试题/函数和表达式.html",
+    "go面试题/内存管理.html",
+    "gitbook/fonts/fontawesome/fontawesome-webfont.svg",
+    "gitbook/images/apple-touch-icon-precomposed-152.png",
+    "bak/kafka/README.md",
+    "bak/README.md",
+    "bak/leetcode/01_LeetCode 热题 HOT 100题解/1.两数之和.md",
+    "bak/SUMMARY.md",
+    "bak/go/stdlib/_index.md",
+    "bak/go/stdlib/unsafe/_index.md",
+    "bak/go/stdlib/unsafe/assets/0.png",
+    "bak/go/stdlib/unsafe/4-如何实现字符串和byte切片的零拷贝转换.md",
+    "bak/go/stdlib/unsafe/3-如何利用unsafe包修改私有成员.md",
+    "bak/go/stdlib/unsafe/2-如何利用unsafe获取slice&map的长度.md",
+    "bak/go/stdlib/unsafe/1-Go指针和unsafe.Pointer有什么区别.md",
+    "bak/go/stdlib/reflect/_index.md",
+    "bak/go/stdlib/reflect/5-如何比较两个对象完全相同.md",
+    "bak/go/stdlib/reflect/assets/0.png",
+    "bak/go/stdlib/reflect/assets/1.png",
+    "bak/go/stdlib/reflect/assets/7.png",
+    "bak/go/stdlib/reflect/assets/6.png",
+    "bak/go/stdlib/reflect/assets/5.png",
+    "bak/go/stdlib/reflect/3-Go 语言如何实现反射.md",
+    "bak/go/stdlib/reflect/4-Go 语言中反射有哪些应用.md",
+    "bak/go/stdlib/reflect/2-什么情况下需要使用反射.md",
+    "bak/go/stdlib/reflect/1-什么是反射.md",
+    "bak/go/stdlib/context/_index.md",
+    "bak/go/stdlib/context/2-context 有什么作用.md",
+    "bak/go/stdlib/context/4-context 如何被取消.md",
+    "bak/go/stdlib/context/3-context.Value 的查找过程是怎样的.md",
+    "bak/go/stdlib/context/1-context 是什么.md",
+    "bak/go/compile/_index.md",
+    "bak/go/compile/5-Go 程序启动过程是怎样的.md",
+    "bak/go/compile/4-Go 编译相关的命令详解.md"
+  ]
+}
