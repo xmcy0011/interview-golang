@@ -1,0 +1,88 @@
+# 哈希表
+
+## map简介
+
+[维基百科](https://en.wikipedia.org/wiki/Associative_array)中的定义如下：
+> In computer science, an associative array, map, symbol table, or dictionary is an abstract data type that stores a collection of (key, value) pairs, such that each possible key appears at most once in the collection. In mathematical terms, an associative array is a function with finite domain. It supports 'lookup', 'remove', and 'insert' operations.
+> 
+> The dictionary problem is the classic problem of designing efficient data structures that implement associative arrays. The two major solutions to the dictionary problem are hash tables and search trees. In some cases it is also possible to solve the problem using directly addressed arrays, binary search trees, or other more specialized structures.
+
+简单总结：map（映射）是关联数组（associative array）的别称，是一种存储了 key-value（键值对）元素的集合，同一个key只会出现一次，支持添加、移除和查找等操作。字典问题（dictionary problem）是设计一种能够具备关联数组特性的高效数据结构。解决字典问题的常用方是哈希表和搜索树。
+
+Go 语言中的 map 主要支持如下操作：
+- 构造：m := map[key]value{}
+- 插入：m[k] = v
+- 查找：v, ok = m[k]
+- 删除：delete(m, k)
+- 迭代：for k,v := range m
+- 容器大小：len(m)
+
+图解map的2种实现方法：
+- `哈希表（hash tables）`：利用数组存储键和值，通过哈希函数对输入的key进行计算找到value所在的位置，它的关键在于哈希函数的选择和哈希冲突时的解决办法（Go中使用拉链法解决），最坏情况是O(n)、平均O(1)
+![map-impl-hashtable](assets/map-impl-hashtable.jpg)
+
+- `搜索树（search trees）`：使用自平衡二叉查找树来查找value（C++中的map就是基于红黑树实现，面试时经常会被问到），最坏O(log n)，平均O(log n)
+![map-impl-rb-tree.jpg](assets/map-impl-rb-tree.jpg)
+
+在Go语言中，`map 使用了哈希表实现`，主要因为哈希表优越的 O(1) 读写性能要优于自平衡搜索树 O(log n) 的性能，下图展示了几种实现方式的时间复杂度：
+
+![complex](assets/map_implemention_complex.jpg)
+
+而在 C++ 的STL中，则同时提供了搜索树（红黑树）和哈希表的2种实现：
+
+```c++
+map<int, int> m1;           // 根据key排序，基于红黑树实现
+unordered_map<int, int> m2; // 无序，基于数组+哈希函数实现
+```
+
+红黑树是一种[自平衡](https://zh.wikipedia.org/wiki/%E5%B9%B3%E8%A1%A1%E6%A0%91)的[二查找叉树](https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%85%83%E6%90%9C%E5%B0%8B%E6%A8%B9)，它的特点是性能稳定，在最坏的情况下也是 O(log n）的查找时间。二叉查找树的特点是中序遍历是有序的，所以基于红黑树实现的 map 的遍历是有序的，而基于哈希表的实现则是乱序的。
+
+因为 Go 的 map 是基于哈希表的实现，故下文中主要介绍基于哈希表的实现原理和重点。
+
+## 哈希表实现的关键点
+
+### 哈希函数
+
+哈希函数主要是用来解决 key 到 value 的映射问题：这个key对应的value存储在哪里？
+
+如下图中，cat 经过哈希函数计算后得到一串数字，再对10取余数，得到Bucket的位置，再遍历比较里面的元素最终得到value值：
+
+![hash_map_array](assets/hash-map-with-array.jpeg)
+
+我们看到，这里我们使用哈希函数把字符串变成了数字，并且不同的字符串计算出来的数字不同，同一个字符串不管运行多少次，计算出的数字一定相同。利用这个特性，我们自己再做一些取余数计算，就能解决 key 到 value 的映射问题。
+
+在理想情况下，哈希函数应该能将不同的键映射到不同的索引，这要求哈希的输出范围要大于输入范围：
+
+![hash_func1](assets/hash_func1.jpg)
+
+但由于键的数量会远远大于映射的范围，所以实际情况的结果会出现不均匀的情况，不同字符的hash code相同，这也就说所谓的哈希冲突问题：
+
+![hash](assets/hash_func2.jpg)
+使用结果分布比较均匀的哈希函数，哈希表的增删改查时间复杂度为O(1)，如果结果分布不均匀，最坏情况下，时间复杂度可能会达到O(n)。
+
+### 冲突解决
+
+常用解决哈希冲突的方法是开放寻址法和拉链法。
+
+开放寻址法的核心思想是依次探测和比较数组中的元素以判断目标键值对是否存在于哈希表中，如果存在，则把元素插入到冲突key的下一个位置：
+![open_addressing](assets/open_addressing.png)
+
+与开放寻址法相比，拉链法是哈希表最常见的实现方法，大多数的编程语言都用拉链法实现哈希表，它的实现比较开放地址法稍微复杂一些，但是平均查找的长度也比较短，各个用于存储节点的内存都是动态申请的，可以节省比较多的存储空间。
+
+实现拉链法一般会使用数组加上链表，不过一些编程语言会在拉链法的哈希中引入红黑树以优化性能，拉链法会使用链表数组作为哈希底层的数据结构，我们可以将它看成可以扩展的二维数组：
+
+![separate_chaining.png](assets/separate_chaining.png)
+
+更多关于 "开放寻址法" 和 “拉链法”的介绍请参考：《Go语言设计与实现》3.3 哈希表一节。 
+
+## 参考
+
+- [Go 程序员面试笔试宝典](https://golang.design/go-questions)
+- [《Go语言设计与实现》](https://draveness.me/golang/)
+- 《Go语言圣经》
+- 《Go程序设计语言》
+- [Data Structures in JavaScript: Arrays, HashMaps, and Lists](https://adrianmejia.com/data-structures-time-complexity-for-beginners-arrays-hashmaps-linked-lists-stacks-queues-tutorial/#HashMap-vs-Array)
+- [Self-balanced Binary Search Trees with AVL in JavaScript](https://adrianmejia.com/self-balanced-binary-search-trees-with-avl-tree-data-structure-for-beginners/)
+- [GopherCon 2016: Keith Randall - Inside the Map Implementation](https://www.youtube.com/watch?v=Tl7mi9QmLns)
+- [Associative array](https://en.wikipedia.org/wiki/Associative_array)
+- [C++ map用法总结（整理）](https://blog.csdn.net/sevenjoin/article/details/81943864)

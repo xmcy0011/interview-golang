@@ -1,12 +1,8 @@
----
-weight: 202
-title: "如何实现两种 get 操作"
-slug: /get
----
+# 如何实现两种 get 操作
 
 Go 语言中读取 map 有两种语法：带 comma 和 不带 comma。当要查询的 key 不在 map 里，带 comma 的用法会返回一个 bool 型变量提示 key 是否在 map 中；而不带 comma 的语句则会返回一个 key 对应 value 类型的零值。如果 value 是 int 型就会返回 0，如果 value 是 string 类型，就会返回空字符串。
 
-```golang
+```go
 package main
 
 import "fmt"
@@ -56,3 +52,5 @@ func mapaccess2(t *maptype, h *hmap, key unsafe.Pointer) (unsafe.Pointer, bool)
 这些函数的参数类型直接是具体的 uint32、unt64、string，在函数内部由于提前知晓了 key 的类型，所以内存布局是很清楚的，因此能节省很多操作，提高效率。
 
 上面这些函数都是在文件 `src/runtime/hashmap_fast.go` 里。
+
+参考：

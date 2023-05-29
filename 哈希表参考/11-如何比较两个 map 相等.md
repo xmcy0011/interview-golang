@@ -1,10 +1,3 @@
----
-weight: 211
-title: "如何比较两个 map 相等"
-slug: /compare
----
-
-
 map 深度相等的条件：
 
 ```shell
