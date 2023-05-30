@@ -1,0 +1,724 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>*切片是怎样扩容的 · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="5-字面量和make初始化切片有区别吗.html" />
+    
+    
+    <link rel="prev" href="2-数组和切片有什么区别.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Go面试复习指南
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Go语法复习/">
+            
+                <a href="../Go语法复习/">
+            
+                    
+                    Go语法复习
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../Go语法复习/程序结构.html">
+            
+                <a href="../Go语法复习/程序结构.html">
+            
+                    
+                    程序结构
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../Go语法复习/表达式.html">
+            
+                <a href="../Go语法复习/表达式.html">
+            
+                    
+                    表达式
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    🐱数组和切片
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="1-slice底层的实现原理.html">
+            
+                <a href="1-slice底层的实现原理.html">
+            
+                    
+                    slice底层的实现原理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="2-数组和切片有什么区别.html">
+            
+                <a href="2-数组和切片有什么区别.html">
+            
+                    
+                    *数组和切片有什么区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.3" data-path="3-切片是怎样扩容的.html">
+            
+                <a href="3-切片是怎样扩容的.html">
+            
+                    
+                    *切片是怎样扩容的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="5-字面量和make初始化切片有区别吗.html">
+            
+                <a href="5-字面量和make初始化切片有区别吗.html">
+            
+                    
+                    字面量和make初始化切片有区别吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                <a href="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                    
+                    拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                <a href="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                    
+                    实际项目中使用slice都遇到过什么坑
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.7" data-path="8-切片的性能优化.html">
+            
+                <a href="8-切片的性能优化.html">
+            
+                    
+                    切片的性能优化
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.8" data-path="4-nil切片和空切片的区别.html">
+            
+                <a href="4-nil切片和空切片的区别.html">
+            
+                    
+                    nil切片和空切片的区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" >
+            
+                <span>
+            
+                    
+                    🔗链表
+            
+                </span>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../哈希表/">
+            
+                <a href="../哈希表/">
+            
+                    
+                    📚哈希表
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../哈希表/1-map的底层实现原理是什么.md">
+            
+                <span>
+            
+                    
+                    map的底层实现原理是什么
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../哈希表/2-如何实现两种 get 操作.md">
+            
+                <span>
+            
+                    
+                    如何实现两种 get 操作
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../哈希表/3-map 的遍历过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的遍历过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../哈希表/4-map 的赋值过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的赋值过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="../哈希表/5-map 的删除过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的删除过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="../哈希表/6-map 的扩容过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的扩容过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="../哈希表/7-map 中的 key 为什么是无序的.md">
+            
+                <span>
+            
+                    
+                    map 中的 key 为什么是无序的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="../哈希表/8-float 类型可以作为 map 的 key 吗.md">
+            
+                <span>
+            
+                    
+                    float 类型可以作为 map 的 key 吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="../9-可以边遍历边删除吗.md">
+            
+                <span>
+            
+                    
+                    可以边遍历边删除吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="../哈希表/10-可以对 map 的元素取地址吗.md">
+            
+                <span>
+            
+                    
+                    可以对 map 的元素取地址吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="../哈希表/11-如何比较两个 map 相等.md">
+            
+                <span>
+            
+                    
+                    如何比较两个 map 相等
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.12" data-path="../哈希表/12-map 是线程安全的吗.md">
+            
+                <span>
+            
+                    
+                    *map 是线程安全的吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >*切片是怎样扩容的</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="&#x5207;&#x7247;&#x662F;&#x600E;&#x6837;&#x6269;&#x5BB9;&#x7684;">&#x5207;&#x7247;&#x662F;&#x600E;&#x6837;&#x6269;&#x5BB9;&#x7684;</h1>
+<p>&#x5207;&#x7247;&#x6269;&#x5BB9;&#x53D1;&#x751F;&#x5728;&#x8C03;&#x7528; <code>append()</code> &#x65F6;&#xFF0C;&#x5982;&#x679C;&#x5207;&#x7247;&#x7684;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x957F;&#x5EA6;&#x5DF2;&#x7ECF;&#x4E0D;&#x8DB3;&#x4EE5;&#x5BB9;&#x7EB3;&#x65B0;&#x6DFB;&#x52A0;&#x7684;&#x5143;&#x7D20;&#x65F6;&#xFF0C;&#x5C31;&#x4F1A;&#x89E6;&#x53D1;&#x6269;&#x5BB9;&#xFF0C;&#x6B64;&#x65F6;go&#x7F16;&#x8BD1;&#x5668;&#x4F1A;&#x8C03;&#x7528; <code>growslice()</code> &#x786E;&#x5B9A;&#x65B0;&#x7684;&#x5BB9;&#x91CF;&#x5927;&#x5C0F;&#xFF0C;&#x7136;&#x540E;&#x62F7;&#x8D1D;&#x8001;&#x7684;&#x5143;&#x7D20;&#x5230;&#x65B0;&#x7684;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x3002;</p>
+<p>&#x6269;&#x5BB9;&#x7B56;&#x7565;&#x81EA; <a href="https://go.googlesource.com/go/+/2dda92ff6f9f07eeb110ecbf0fc2d7a0ddd27f9d" target="_blank">runtime: make slice growth formula a bit smoother</a>&#x63D0;&#x4EA4;&#x540E;&#x6709;&#x4E00;&#x4E9B;&#x6539;&#x53D8;&#xFF0C;&#x8FD9;&#x4E2A;&#x63D0;&#x4EA4;&#x81EA;<code>Go1.18</code>&#x540E;&#x751F;&#x6548;&#xFF0C;&#x4E3B;&#x8981;&#x6709;2&#x5904;&#x4F18;&#x5316;&#xFF1A;2&#x500D;&#x6269;&#x5BB9;&#x7531;1024&#x6539;&#x6210;256&#xFF0C;&#x8D85;&#x8FC7;&#x4E4B;&#x540E;&#x56FA;&#x5B9A;1.25&#x500D;&#x6269;&#x5BB9;&#x6539;&#x6210;&#x4E86;&#x8868;&#x8FBE;&#x5F0F;&#x8BA1;&#x7B97;&#xFF0C;&#x4F7F;&#x6269;&#x5BB9;&#x4E0B;&#x964D;&#x7684;&#x66F4;&#x5E73;&#x6ED1;&#x3002;</p>
+<h2 id="go117&#x6269;&#x5BB9;&#x5B9E;&#x73B0;">Go1.17&#x6269;&#x5BB9;&#x5B9E;&#x73B0;</h2>
+<p>&#x6269;&#x5BB9;&#x7B56;&#x7565;&#x6E90;&#x7801;&#x5982;&#x4E0B;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-comment">// go.17 src/runtime/slice.go</span>
+<span class="hljs-keyword">func</span> growslice(et *_type, old slice, <span class="hljs-built_in">cap</span> <span class="hljs-keyword">int</span>) slice {
+    newcap := old.<span class="hljs-built_in">cap</span>
+    doublecap := newcap + newcap
+    <span class="hljs-comment">// 1.&#x65B0;&#x5BB9;&#x91CF;&#x8BA1;&#x7B97;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">cap</span> &gt; doublecap {
+        newcap = <span class="hljs-built_in">cap</span>
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">if</span> old.<span class="hljs-built_in">cap</span> &lt; <span class="hljs-number">1024</span> {
+            newcap = doublecap
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">for</span> <span class="hljs-number">0</span> &lt; newcap &amp;&amp; newcap &lt; <span class="hljs-built_in">cap</span> {
+                newcap += newcap / <span class="hljs-number">4</span> 
+            }
+            <span class="hljs-keyword">if</span> newcap &lt;= <span class="hljs-number">0</span> {
+                newcap = <span class="hljs-built_in">cap</span>
+            }
+        }
+    }
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-comment">// 2.&#x5185;&#x5B58;&#x5BF9;&#x9F50;&#x8BA1;&#x7B97;&#xFF0C;&#x6700;&#x7EC8;&#x7684;&#x7684;&#x5BB9;&#x91CF;&#x4F1A;&#x5927;&#x4E8E;&#x7B49;&#x4E8E;&#x4E0A;&#x9762;&#x7684; newcap</span>
+    <span class="hljs-keyword">var</span> overflow <span class="hljs-keyword">bool</span>
+    <span class="hljs-keyword">var</span> lenmem, newlenmem, capmem <span class="hljs-keyword">uintptr</span>
+    <span class="hljs-keyword">switch</span> {
+    <span class="hljs-keyword">case</span> et.size == <span class="hljs-number">1</span>:
+        <span class="hljs-comment">// ...</span>
+    <span class="hljs-keyword">case</span> et.size == sys.PtrSize:
+        lenmem = <span class="hljs-keyword">uintptr</span>(old.<span class="hljs-built_in">len</span>) * sys.PtrSize
+        newlenmem = <span class="hljs-keyword">uintptr</span>(<span class="hljs-built_in">cap</span>) * sys.PtrSize
+        capmem = roundupsize(<span class="hljs-keyword">uintptr</span>(newcap) * sys.PtrSize)
+        overflow = <span class="hljs-keyword">uintptr</span>(newcap) &gt; maxAlloc/sys.PtrSize
+        newcap = <span class="hljs-keyword">int</span>(capmem / sys.PtrSize)
+    <span class="hljs-keyword">case</span> isPowerOfTwo(et.size):
+        <span class="hljs-comment">// ...</span>
+    <span class="hljs-keyword">default</span>:
+        <span class="hljs-comment">// ...</span>
+    }
+    <span class="hljs-comment">//...</span>
+    memmove(p, old.array, lenmem)
+    <span class="hljs-keyword">return</span> slice{p, old.<span class="hljs-built_in">len</span>, newcap}
+}
+</code></pre>
+<ul>
+<li>&#x65B0;&#x5BB9;&#x91CF;&#x8BA1;&#x7B97;<ul>
+<li>&#x5982;&#x679C;&#x671F;&#x671B;&#x5927;&#x5C0F;&#x8D85;&#x8FC7;&#x73B0;&#x6709;&#x5BB9;&#x91CF;2&#x500D;&#xFF0C;&#x5219;&#x76F4;&#x63A5;&#x4F7F;&#x7528;&#x671F;&#x671B;&#x5BB9;&#x91CF;</li>
+<li>&#x5982;&#x679C;&#x5BB9;&#x91CF;&#x5C0F;&#x4E8E;1024&#xFF08;<code>Go1.18&#x540E;&#x662F;256</code>&#xFF09;&#xFF0C;2&#x500D;&#x6269;&#x5BB9;&#xFF0C;&#x5426;&#x5219;1.25&#x500D;&#x6269;&#x5BB9;&#xFF08;<code>Go1.18&#x540E;&#x7531;&#x8868;&#x8FBE;&#x5F0F;&#x8BA1;&#x7B97;</code>&#xFF09;</li>
+</ul>
+</li>
+<li>&#x6700;&#x7EC8;&#x5BB9;&#x91CF;&#x8BA1;&#x7B97;&#xFF1A;&#x4E3A;&#x4E86;&#x907F;&#x514D;&#x5185;&#x5B58;&#x788E;&#x7247;&#xFF0C;&#x6700;&#x540E;&#x4F1A;&#x8FDB;&#x884C; <code>&#x5185;&#x5B58;&#x5BF9;&#x9F50;&#x8BA1;&#x7B97;</code>&#xFF0C;&#x6240;&#x4EE5;&#x6700;&#x540E;&#x7684;&#x7ED3;&#x679C;&#x4F1A;&#x5927;&#x4E8E;&#x7B49;&#x4E8E;&#x4E0A;&#x9762;&#x8BA1;&#x7B97;&#x7684;&#x503C;&#x3002;</li>
+</ul>
+<p><code>roundupsize</code> &#x51FD;&#x6570;&#x7528;&#x6765;&#x8BA1;&#x7B97;&#x5185;&#x5B58;&#x5BF9;&#x9F50;&#x540E;&#x6700;&#x7EC8;&#x7684;&#x5BB9;&#x91CF;&#x503C;&#xFF0C;&#x5B9E;&#x9645;&#x4E0A;&#x5C31;&#x662F;&#x6839;&#x636E;&#x6240;&#x9700;&#x5185;&#x5B58;&#x5927;&#x5C0F;&#x8FDB;&#x884C;&#x5411;&#x4E0A;&#x53D6;&#x6574;&#xFF0C;&#x7136;&#x540E;&#x4F7F;&#x7528;&#x6570;&#x7EC4; <code>class_to_size</code> &#x4E2D;&#x7684;&#x6574;&#x6570;&#x4EE5;&#x63D0;&#x4F9B;&#x5185;&#x5B58;&#x5206;&#x914D;&#x6548;&#x7387;&#x5E76;&#x51CF;&#x5C11;&#x5185;&#x5B58;&#x788E;&#x7247;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-keyword">var</span> class_to_size = [_NumSizeClasses]<span class="hljs-keyword">uint16</span>{<span class="hljs-number">0</span>, <span class="hljs-number">8</span>, <span class="hljs-number">16</span>, <span class="hljs-number">24</span>, <span class="hljs-number">32</span>, <span class="hljs-number">48</span>, <span class="hljs-number">64</span>, ...}
+<span class="hljs-keyword">var</span> size_to_class8 = [smallSizeMax/smallSizeDiv + <span class="hljs-number">1</span>]<span class="hljs-keyword">uint8</span>{<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">5</span>, ...}
+
+<span class="hljs-keyword">func</span> roundupsize(size <span class="hljs-keyword">uintptr</span>) <span class="hljs-keyword">uintptr</span> {
+    <span class="hljs-keyword">if</span> size &lt; _MaxSmallSize {       <span class="hljs-comment">// 32768</span>
+        <span class="hljs-keyword">if</span> size &lt;= smallSizeMax<span class="hljs-number">-8</span> { <span class="hljs-comment">// 1024</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">uintptr</span>(class_to_size[size_to_class8[divRoundUp(size, smallSizeDiv)]])
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">uintptr</span>(class_to_size[size_to_class128[divRoundUp(size-smallSizeMax, largeSizeDiv)]])
+        }
+    } 
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p>&#x4E0B;&#x9762;&#x662F;&#x8FD9;&#x4E2A;&#x6570;&#x7EC4;&#x9884;&#x5B9A;&#x4E49;&#x7684;&#x5185;&#x5B58;&#x5927;&#x5C0F;&#xFF08;class&#x662F;size_to_class8&#x8BA1;&#x7B97;&#x7684;&#x7D22;&#x5F15;&#xFF0C;bytes/obj&#x662F;class_to_size&#x4E2D;&#x5B58;&#x653E;&#x7684;&#x6574;&#x6570;&#xFF09;&#xFF1A;</p>
+<pre><code class="lang-bash">class  bytes/obj  bytes/span  objects  tail waste  max waste  min align  
+    1          8        8192     1024           0     87.50%          8  
+    2         16        8192      512           0     43.75%         16  
+    3         24        8192      341           8     29.24%          8  
+    4         32        8192      256           0     21.88%         32  
+    5         48        8192      170          32     31.52%         16  
+   ... 
+   67      32768       32768        1           0     12.50%       8192
+</code></pre>
+<p>&#x6211;&#x4EEC;&#x6765;&#x770B;&#x4E00;&#x4E2A;&#x5B9E;&#x4F8B;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-keyword">var</span> s []<span class="hljs-keyword">int</span>                    <span class="hljs-comment">// len: 0 cap: 0</span>
+
+s = <span class="hljs-built_in">append</span>(s, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>)  
+fmt.Println(s, <span class="hljs-built_in">len</span>(s), <span class="hljs-built_in">cap</span>(s)) <span class="hljs-comment">// len: 2 cap: 2</span>
+
+s = <span class="hljs-built_in">append</span>(s, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>)  
+fmt.Println(s, <span class="hljs-built_in">len</span>(s), <span class="hljs-built_in">cap</span>(s)) <span class="hljs-comment">// len: 5 cap: 6</span>
+
+s = <span class="hljs-built_in">append</span>(s, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>)  
+fmt.Println(s, <span class="hljs-built_in">len</span>(s), <span class="hljs-built_in">cap</span>(s)) <span class="hljs-comment">// len: 6 cap: 12</span>
+</code></pre>
+<ol>
+<li>nil&#x5207;&#x7247; <code>s</code> &#x7684; <code>len</code> &#x548C; <code>cap</code> &#x90FD;&#x4E3A;0</li>
+<li>&#x5F53;&#x6DFB;&#x52A0;&#x5143;&#x7D20; <code>1,2</code> &#x65F6;&#xFF0C;&#x671F;&#x671B;&#x5BB9;&#x91CF;&#x662F;2&#xFF0C;&#x5F53;&#x524D;&#x5BB9;&#x91CF;&#x662F;0&#xFF0C;&#x6EE1;&#x8DB3; <code>cap &gt; doublecap</code> &#x6761;&#x4EF6;&#xFF0C;&#x6545;&#x65B0;&#x5BB9;&#x91CF;&#x4E3A;2&#x3002;&#x7136;&#x540E;&#x8FDB;&#x884C;&#x5185;&#x5B58;&#x5BF9;&#x9F50;&#x8BA1;&#x7B97;&#xFF0C;int&#x5728;64&#x4F4D;&#x5360;8&#x5B57;&#x8282;&#xFF0C;&#x4E8E;&#x662F;&#x9700;&#x8981;2*6=16&#x5B57;&#x8282;&#x7684;&#x5185;&#x5B58;&#xFF0C;&#x67E5;&#x4E0A;&#x8868;Go&#x53EF;&#x5206;&#x914D;&#x8BE5;&#x5927;&#x5C0F;&#xFF0C;&#x4E8E;&#x662F; <code>cap</code> &#x6700;&#x7EC8;&#x4E3A;2&#x3002;</li>
+<li>&#x5F53;&#x6DFB;&#x52A0;&#x5143;&#x7D20; <code>3,4,5</code> &#x65F6;&#xFF0C;&#x4E5F;&#x6EE1;&#x8DB3;&#x671F;&#x671B;&#x5BB9;&#x91CF;&#x8D85;&#x8FC7;2&#x500D;&#x5F53;&#x524D;&#x5BB9;&#x91CF;&#x7684;&#x6761;&#x4EF6;&#xFF08;cap &gt; doublecap&#xFF09;&#xFF0C;&#x4E8E;&#x662F;&#x521D;&#x6B65;&#x8BA1;&#x7B97;&#x51FA;&#x65B0;&#x5BB9;&#x91CF;&#x4E3A;5&#x3002;&#x6B64;&#x65F6;&#x9700;&#x8981;&#x5185;&#x5B58;&#x5927;&#x5C0F;&#x4E3A;5*8=40&#xFF0C;&#x4E3A;&#x4E86;&#x51CF;&#x5C11;&#x5185;&#x5B58;&#x788E;&#x7247;&#x4EE5;&#x53CA;&#x63D0;&#x9AD8;&#x5206;&#x914D;&#x6548;&#x7387;&#xFF0C;&#x8FDB;&#x884C;&#x5185;&#x5B58;&#x5BF9;&#x9F50;&#x8BA1;&#x7B97;&#x540E;&#x5411;&#x4E0A;&#x53D6;&#x6574;&#x5F97;&#x5230;48&#xFF0C;48/8=6&#x4E2A;&#x5143;&#x7D20;&#xFF0C;&#x4E8E;&#x662F; <code>cap</code> &#x6700;&#x7EC8;&#x4E3A;6&#x3002;</li>
+<li>&#x5F53;&#x6DFB;&#x52A0;&#x5143;&#x7D20; <code>6,7</code> &#x65F6;&#xFF0C;&#x65E7;&#x5BB9;&#x91CF;&#x5C0F;&#x4E8E;1024&#xFF08;<code>G1.18&#x540E;&#x8981;&#x5C0F;&#x4E8E;256</code>&#xFF09;&#xFF0C;&#x4E8E;&#x662F;2&#x500D;&#x6269;&#x5BB9;&#x5F97;&#x5230;12&#xFF0C;12*8=96&#x6EE1;&#x8DB3;&#x5185;&#x5B58;&#x5206;&#x914D;&#x8981;&#x6C42;&#xFF0C;&#x6545;&#x6700;&#x7EC8; <code>cap</code> &#x4E3A;12&#x3002;</li>
+</ol>
+<p>&#x6700;&#x540E;&#xFF0C;&#x81EA; <code>Go1.18</code> &#x5F00;&#x59CB;&#xFF0C;&#x8D85;&#x8FC7;256&#x6269;&#x5BB9;&#x5927;&#x5C0F;&#x6539;&#x6210;&#x4E86;&#x8868;&#x8FBE;&#x5F0F;&#x8BA1;&#x7B97;&#xFF0C;&#x4E0D;&#x518D;&#x662F;&#x56FA;&#x5B9A;&#x7684;1.25&#x500D;&#xFF08;1.25&#x500D; &lt; growth factor &lt; 2&#x500D;&#xFF09;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-comment">// go1.18 src/runtime/slice.go</span>
+<span class="hljs-keyword">func</span> growslice(et *_type, old slice, <span class="hljs-built_in">cap</span> <span class="hljs-keyword">int</span>) slice {
+    <span class="hljs-comment">// ...</span>
+    newcap := old.<span class="hljs-built_in">cap</span>
+    doublecap := newcap + newcap
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">cap</span> &gt; doublecap {
+        newcap = <span class="hljs-built_in">cap</span>
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">const</span> threshold = <span class="hljs-number">256</span> <span class="hljs-comment">// &#x4E4B;&#x524D;&#x662F;1024</span>
+        <span class="hljs-keyword">if</span> old.<span class="hljs-built_in">cap</span> &lt; threshold {
+            newcap = doublecap
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">for</span> <span class="hljs-number">0</span> &lt; newcap &amp;&amp; newcap &lt; <span class="hljs-built_in">cap</span> {
+                <span class="hljs-comment">// Transition from growing 2x for small slices</span>
+                <span class="hljs-comment">// to growing 1.25x for large slices. This formula</span>
+                <span class="hljs-comment">// gives a smooth-ish transition between the two.</span>
+                newcap += (newcap + <span class="hljs-number">3</span>*threshold) / <span class="hljs-number">4</span>
+            }
+            <span class="hljs-keyword">if</span> newcap &lt;= <span class="hljs-number">0</span> {
+                newcap = <span class="hljs-built_in">cap</span>
+            }
+        }
+    }
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
+<p>&#x5F15;&#x5165;&#x8BE5;&#x8868;&#x8FBE;&#x5F0F;&#x540E;&#xFF0C;&#x6269;&#x5BB9;&#x4F1A;&#x66F4;&#x52A0;&#x5E73;&#x6ED1;&#xFF0C; Keith Randall &#x5927;&#x795E;&#x63D0;&#x4EA4;&#x7684;&#x63CF;&#x8FF0;&#x7ED9;&#x51FA;&#x4E86;&#x4E00;&#x4E2A;&#x793A;&#x4F8B;&#xFF08;growth factor&#x8D8A;&#x6765;&#x8D8A;&#x5C0F;&#xFF09;&#xFF1A;</p>
+<pre><code class="lang-bash">runtime: make slice growth formula a bit smoother
+
+Instead of growing 2x <span class="hljs-keyword">for</span> &lt; 1024 elements and 1.25x <span class="hljs-keyword">for</span> &gt;= 1024 elements,
+use a somewhat smoother formula <span class="hljs-keyword">for</span> the growth factor. Start reducing
+the growth factor after 256 elements, but slowly.
+
+starting <span class="hljs-built_in">cap</span>    growth factor
+256             2.0
+512             1.63
+1024            1.44
+2048            1.35
+4096            1.30
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="2-数组和切片有什么区别.html" class="navigation navigation-prev " aria-label="Previous page: *数组和切片有什么区别">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="5-字面量和make初始化切片有区别吗.html" class="navigation navigation-next " aria-label="Next page: 字面量和make初始化切片有区别吗">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"*切片是怎样扩容的","level":"1.3.3","depth":2,"next":{"title":"字面量和make初始化切片有区别吗","level":"1.3.4","depth":2,"path":"数组和切片/5-字面量和make初始化切片有区别吗.md","ref":"数组和切片/5-字面量和make初始化切片有区别吗.md","articles":[]},"previous":{"title":"*数组和切片有什么区别","level":"1.3.2","depth":2,"path":"数组和切片/2-数组和切片有什么区别.md","ref":"数组和切片/2-数组和切片有什么区别.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"数组和切片/3-切片是怎样扩容的.md","mtime":"2023-05-30T07:42:13.087Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-05-30T07:42:24.307Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

@@ -1,0 +1,615 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>slice底层的实现原理 · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="2-数组和切片有什么区别.html" />
+    
+    
+    <link rel="prev" href="./" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Go面试复习指南
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Go语法复习/">
+            
+                <a href="../Go语法复习/">
+            
+                    
+                    Go语法复习
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../Go语法复习/程序结构.html">
+            
+                <a href="../Go语法复习/程序结构.html">
+            
+                    
+                    程序结构
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../Go语法复习/表达式.html">
+            
+                <a href="../Go语法复习/表达式.html">
+            
+                    
+                    表达式
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    🐱数组和切片
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.3.1" data-path="1-slice底层的实现原理.html">
+            
+                <a href="1-slice底层的实现原理.html">
+            
+                    
+                    slice底层的实现原理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="2-数组和切片有什么区别.html">
+            
+                <a href="2-数组和切片有什么区别.html">
+            
+                    
+                    *数组和切片有什么区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="3-切片是怎样扩容的.html">
+            
+                <a href="3-切片是怎样扩容的.html">
+            
+                    
+                    *切片是怎样扩容的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="5-字面量和make初始化切片有区别吗.html">
+            
+                <a href="5-字面量和make初始化切片有区别吗.html">
+            
+                    
+                    字面量和make初始化切片有区别吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                <a href="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                    
+                    拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                <a href="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                    
+                    实际项目中使用slice都遇到过什么坑
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.7" data-path="8-切片的性能优化.html">
+            
+                <a href="8-切片的性能优化.html">
+            
+                    
+                    切片的性能优化
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.8" data-path="4-nil切片和空切片的区别.html">
+            
+                <a href="4-nil切片和空切片的区别.html">
+            
+                    
+                    nil切片和空切片的区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" >
+            
+                <span>
+            
+                    
+                    🔗链表
+            
+                </span>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../哈希表/">
+            
+                <a href="../哈希表/">
+            
+                    
+                    📚哈希表
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../哈希表/1-map的底层实现原理是什么.md">
+            
+                <span>
+            
+                    
+                    map的底层实现原理是什么
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../哈希表/2-如何实现两种 get 操作.md">
+            
+                <span>
+            
+                    
+                    如何实现两种 get 操作
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../哈希表/3-map 的遍历过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的遍历过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../哈希表/4-map 的赋值过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的赋值过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="../哈希表/5-map 的删除过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的删除过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="../哈希表/6-map 的扩容过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的扩容过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="../哈希表/7-map 中的 key 为什么是无序的.md">
+            
+                <span>
+            
+                    
+                    map 中的 key 为什么是无序的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="../哈希表/8-float 类型可以作为 map 的 key 吗.md">
+            
+                <span>
+            
+                    
+                    float 类型可以作为 map 的 key 吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="../9-可以边遍历边删除吗.md">
+            
+                <span>
+            
+                    
+                    可以边遍历边删除吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="../哈希表/10-可以对 map 的元素取地址吗.md">
+            
+                <span>
+            
+                    
+                    可以对 map 的元素取地址吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="../哈希表/11-如何比较两个 map 相等.md">
+            
+                <span>
+            
+                    
+                    如何比较两个 map 相等
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.12" data-path="../哈希表/12-map 是线程安全的吗.md">
+            
+                <span>
+            
+                    
+                    *map 是线程安全的吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >slice底层的实现原理</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="slice&#x5E95;&#x5C42;&#x7684;&#x5B9E;&#x73B0;&#x539F;&#x7406;">slice&#x5E95;&#x5C42;&#x7684;&#x5B9E;&#x73B0;&#x539F;&#x7406;</h1>
+<p>&#x5207;&#x7247;&#xFF08;slice&#xFF09;&#x901A;&#x8FC7;&#x6570;&#x7EC4;&#x6307;&#x9488;&#x3001;&#x957F;&#x5EA6;&#xFF08;len&#xFF09;&#x548C;&#x5BB9;&#x91CF;&#xFF08;cap&#xFF09;3&#x4E2A;&#x5B57;&#x6BB5;&#x7684;&#x8BBE;&#x8BA1;&#xFF0C;&#x5B9E;&#x73B0;&#x4E86;&#x7C7B;&#x4F3C;&#x52A8;&#x6001;&#x6570;&#x7EC4;&#x7684;&#x529F;&#x80FD;&#x3002;&#x4F46;&#x662F;&#x5B83;&#x672C;&#x8EAB;&#x5E76;&#x975E;&#x52A8;&#x6001;&#x6570;&#x7EC4;&#xFF0C;&#x800C;&#x662F;&#x901A;&#x8FC7;&#x5185;&#x90E8;&#x6307;&#x9488;&#x5F15;&#x7528;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#xFF0C;&#x6240;&#x4EE5;&#x5728;&#x8D4B;&#x503C;&#x3001;&#x51FD;&#x6570;&#x4F20;&#x53C2;&#x65F6;&#xFF0C;&#x4E0D;&#x4F1A;&#x6D89;&#x53CA;&#x5230;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x7684;&#x6570;&#x636E;&#x62F7;&#x8D1D;&#x3002;&#x56E0;&#x4E3A;&#x590D;&#x5236; <code>slice</code> &#x7684;&#x4EE3;&#x4EF7;&#x5F88;&#x5C0F;&#xFF08;1&#x4E2A;&#x6307;&#x9488;&#xFF0C;2&#x4E2A;int&#x53D8;&#x91CF;&#xFF09;&#xFF0C;&#x901A;&#x5E38;&#x5728;&#x51FD;&#x6570;&#x4F20;&#x53C2;&#x65F6;&#x53C2;&#x6570;&#x7C7B;&#x578B;&#x4F7F;&#x7528;T&#x800C;&#x4E0D;&#x662F; *T&#xFF08;&#x6307;&#x9488;&#xFF09;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-keyword">type</span> slice <span class="hljs-keyword">struct</span> {  
+   array unsafe.Pointer  
+   <span class="hljs-built_in">len</span>   <span class="hljs-keyword">int</span>  
+   <span class="hljs-built_in">cap</span>   <span class="hljs-keyword">int</span>  
+}
+</code></pre>
+<p>&#x5207;&#x7247;&#x4E3A;&#x6211;&#x4EEC;&#x5C01;&#x88C5;&#x4E86;&#x5FEB;&#x901F;&#x8BBF;&#x95EE;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x7684;&#x80FD;&#x529B;&#xFF0C;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x4F7F;&#x7528; <code>&#x7D22;&#x5F15;&#x4E0B;&#x6807;</code> &#x8BBF;&#x95EE;&#x6216;&#x66F4;&#x65B0;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x4E2D;&#x5143;&#x7D20;&#x7684;&#x503C;&#xFF0C;&#x5207;&#x7247;&#x4F1A;&#x81EA;&#x52A8;&#x8BA1;&#x7B97;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x7684;&#x5730;&#x5740;&#x504F;&#x79FB;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">3</span>]<span class="hljs-keyword">int</span>{<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>}  
+s := arr[<span class="hljs-number">1</span>:]  <span class="hljs-comment">// &#x4F7F;&#x7528;arr&#x5E95;&#x5C42;&#x6570;&#x7EC4;</span>
+s[<span class="hljs-number">0</span>] = <span class="hljs-number">3</span>      <span class="hljs-comment">// &#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x7684;&#x504F;&#x79FB;&#x5730;&#x5740; = arr[1]&#xFF0C;&#x5207;&#x7247;&#x8FDB;&#x884C;&#x4E86;&#x8F6C;&#x6362;</span>
+fmt.Println(arr)  <span class="hljs-comment">// 0 3 2</span>
+fmt.Println(s)    <span class="hljs-comment">// 3 2</span>
+</code></pre>
+<p>&#x4E5F;&#x53EF;&#x4EE5;&#x4F7F;&#x7528; <code>&#x7D22;&#x5F15;&#x533A;&#x95F4;</code> &#x8BBF;&#x95EE;&#x6570;&#x7EC4;&#x6216;&#x8005;&#x5176;&#x4ED6;&#x5207;&#x7247;&#x4E2D;&#x7684;&#x67D0;&#x4E00;&#x90E8;&#x5206;&#x6570;&#x636E;&#xFF0C;&#x56E0;&#x4E3A;&#x662F;&#x57FA;&#x4E8E;&#x6570;&#x7EC4;&#x6307;&#x9488;&#x7684;&#x64CD;&#x4F5C;&#xFF0C;&#x6240;&#x4EE5;&#x4E0D;&#x4F1A;&#x6709;&#x5185;&#x5B58;&#x7684;&#x62F7;&#x8D1D;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-keyword">var</span> arr = [<span class="hljs-number">5</span>]<span class="hljs-keyword">int</span>{<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>}  
+s1 := arr[:<span class="hljs-number">3</span>] <span class="hljs-comment">// 0,1,2 &#x57FA;&#x4E8E;&#x6570;&#x7EC4;&#x521B;&#x5EFA;&#x5207;&#x7247;  </span>
+s2 := s1[:<span class="hljs-number">1</span>]  <span class="hljs-comment">// 0,1   &#x57FA;&#x4E8E;&#x5207;&#x7247;&#x521B;&#x5EFA;&#x5207;&#x7247;(reslice)  </span>
+
+fmt.Println((*reflect.SliceHeader)(unsafe.Pointer(&amp;s1))) <span class="hljs-comment">// &amp;{824634957824 3 5}  </span>
+fmt.Println((*reflect.SliceHeader)(unsafe.Pointer(&amp;s2))) <span class="hljs-comment">// &amp;{824634957824 1 5}</span>
+</code></pre>
+<p>&#x5F53;&#x8FFD;&#x52A0;&#x5143;&#x7D20;&#x5E95;&#x5C42;&#x6570;&#x7EC4;&#x5BB9;&#x91CF;&#x4E0D;&#x8DB3;&#x65F6;&#xFF0C;&#x5207;&#x7247;&#x8FD8;&#x4F1A;&#x81EA;&#x52A8; <code>&#x521B;&#x5EFA;&#x65B0;&#x7684;&#x5E95;&#x5C42;&#x6570;&#x7EC4;</code>&#xFF0C;&#x5B9E;&#x73B0;&#x52A8;&#x6001;&#x6269;&#x5BB9;&#x7684;&#x529F;&#x80FD;&#xFF1A;</p>
+<pre><code class="lang-go"><span class="hljs-keyword">var</span> s1 = []<span class="hljs-keyword">int</span>{<span class="hljs-number">1</span>, <span class="hljs-number">2</span>} <span class="hljs-comment">// &#x6CE8;&#x610F;&#xFF1A;&#x4E0D;&#x6307;&#x5B9A;&#x957F;&#x5EA6;&#x662F;&#x521B;&#x5EFA;&#x7684;&#x5207;&#x7247;  </span>
+fmt.Println((*reflect.SliceHeader)(unsafe.Pointer(&amp;s1))) <span class="hljs-comment">// &amp;{824634400800 2 2}</span>
+
+s2 := <span class="hljs-built_in">append</span>(s1, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)  
+fmt.Println((*reflect.SliceHeader)(unsafe.Pointer(&amp;s2))) <span class="hljs-comment">// &amp;{824634466336 4 4}</span>
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="./" class="navigation navigation-prev " aria-label="Previous page: 🐱数组和切片">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="2-数组和切片有什么区别.html" class="navigation navigation-next " aria-label="Next page: *数组和切片有什么区别">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"slice底层的实现原理","level":"1.3.1","depth":2,"next":{"title":"*数组和切片有什么区别","level":"1.3.2","depth":2,"path":"数组和切片/2-数组和切片有什么区别.md","ref":"数组和切片/2-数组和切片有什么区别.md","articles":[]},"previous":{"title":"🐱数组和切片","level":"1.3","depth":1,"path":"数组和切片/README.md","ref":"数组和切片/README.md","articles":[{"title":"slice底层的实现原理","level":"1.3.1","depth":2,"path":"数组和切片/1-slice底层的实现原理.md","ref":"数组和切片/1-slice底层的实现原理.md","articles":[]},{"title":"*数组和切片有什么区别","level":"1.3.2","depth":2,"path":"数组和切片/2-数组和切片有什么区别.md","ref":"数组和切片/2-数组和切片有什么区别.md","articles":[]},{"title":"*切片是怎样扩容的","level":"1.3.3","depth":2,"path":"数组和切片/3-切片是怎样扩容的.md","ref":"数组和切片/3-切片是怎样扩容的.md","articles":[]},{"title":"字面量和make初始化切片有区别吗","level":"1.3.4","depth":2,"path":"数组和切片/5-字面量和make初始化切片有区别吗.md","ref":"数组和切片/5-字面量和make初始化切片有区别吗.md","articles":[]},{"title":"拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗","level":"1.3.5","depth":2,"path":"数组和切片/6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.md","ref":"数组和切片/6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.md","articles":[]},{"title":"实际项目中使用slice都遇到过什么坑","level":"1.3.6","depth":2,"path":"数组和切片/7-实际项目中使用slice都遇到过什么坑.md","ref":"数组和切片/7-实际项目中使用slice都遇到过什么坑.md","articles":[]},{"title":"切片的性能优化","level":"1.3.7","depth":2,"path":"数组和切片/8-切片的性能优化.md","ref":"数组和切片/8-切片的性能优化.md","articles":[]},{"title":"nil切片和空切片的区别","level":"1.3.8","depth":2,"path":"数组和切片/4-nil切片和空切片的区别.md","ref":"数组和切片/4-nil切片和空切片的区别.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"数组和切片/1-slice底层的实现原理.md","mtime":"2023-05-30T07:42:13.086Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-05-30T07:42:24.307Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

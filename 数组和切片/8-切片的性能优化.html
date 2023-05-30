@@ -1,0 +1,605 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>切片的性能优化 · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="4-nil切片和空切片的区别.html" />
+    
+    
+    <link rel="prev" href="7-实际项目中使用slice都遇到过什么坑.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Go面试复习指南
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Go语法复习/">
+            
+                <a href="../Go语法复习/">
+            
+                    
+                    Go语法复习
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../Go语法复习/程序结构.html">
+            
+                <a href="../Go语法复习/程序结构.html">
+            
+                    
+                    程序结构
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../Go语法复习/表达式.html">
+            
+                <a href="../Go语法复习/表达式.html">
+            
+                    
+                    表达式
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    🐱数组和切片
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="1-slice底层的实现原理.html">
+            
+                <a href="1-slice底层的实现原理.html">
+            
+                    
+                    slice底层的实现原理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="2-数组和切片有什么区别.html">
+            
+                <a href="2-数组和切片有什么区别.html">
+            
+                    
+                    *数组和切片有什么区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="3-切片是怎样扩容的.html">
+            
+                <a href="3-切片是怎样扩容的.html">
+            
+                    
+                    *切片是怎样扩容的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="5-字面量和make初始化切片有区别吗.html">
+            
+                <a href="5-字面量和make初始化切片有区别吗.html">
+            
+                    
+                    字面量和make初始化切片有区别吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                <a href="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                    
+                    拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                <a href="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                    
+                    实际项目中使用slice都遇到过什么坑
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.7" data-path="8-切片的性能优化.html">
+            
+                <a href="8-切片的性能优化.html">
+            
+                    
+                    切片的性能优化
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.8" data-path="4-nil切片和空切片的区别.html">
+            
+                <a href="4-nil切片和空切片的区别.html">
+            
+                    
+                    nil切片和空切片的区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" >
+            
+                <span>
+            
+                    
+                    🔗链表
+            
+                </span>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../哈希表/">
+            
+                <a href="../哈希表/">
+            
+                    
+                    📚哈希表
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../哈希表/1-map的底层实现原理是什么.md">
+            
+                <span>
+            
+                    
+                    map的底层实现原理是什么
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../哈希表/2-如何实现两种 get 操作.md">
+            
+                <span>
+            
+                    
+                    如何实现两种 get 操作
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../哈希表/3-map 的遍历过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的遍历过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../哈希表/4-map 的赋值过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的赋值过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="../哈希表/5-map 的删除过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的删除过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="../哈希表/6-map 的扩容过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的扩容过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="../哈希表/7-map 中的 key 为什么是无序的.md">
+            
+                <span>
+            
+                    
+                    map 中的 key 为什么是无序的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="../哈希表/8-float 类型可以作为 map 的 key 吗.md">
+            
+                <span>
+            
+                    
+                    float 类型可以作为 map 的 key 吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="../9-可以边遍历边删除吗.md">
+            
+                <span>
+            
+                    
+                    可以边遍历边删除吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="../哈希表/10-可以对 map 的元素取地址吗.md">
+            
+                <span>
+            
+                    
+                    可以对 map 的元素取地址吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="../哈希表/11-如何比较两个 map 相等.md">
+            
+                <span>
+            
+                    
+                    如何比较两个 map 相等
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.12" data-path="../哈希表/12-map 是线程安全的吗.md">
+            
+                <span>
+            
+                    
+                    *map 是线程安全的吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >切片的性能优化</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="&#x5207;&#x7247;&#x7684;&#x6027;&#x80FD;&#x4F18;&#x5316;">&#x5207;&#x7247;&#x7684;&#x6027;&#x80FD;&#x4F18;&#x5316;</h1>
+<ol>
+<li>&#x5220;&#x9664;&#x5143;&#x7D20;&#x65F6;&#xFF0C;&#x628A;&#x7A7A;&#x4F59;&#x4F4D;&#x7F6E;&#x7F6E;&#x7A7A;&#xFF0C;&#x6709;&#x52A9;&#x4E8E;&#x5783;&#x573E;&#x56DE;&#x6536;</li>
+</ol>
+<p><strong>&#x60C5;&#x51B5;1</strong>&#xFF1A;&#x5F88;&#x5C0F;&#x4E00;&#x90E8;&#x5206;&#x4E0D;&#x518D;&#x4F7F;&#x7528;&#xFF08;&#x5C11;&#x89C1;&#xFF09;
+&#x5982; <a href="https://geektutu.com/post/hpg-slice.html#2-4-Delete-GC" target="_blank">Go &#x8BED;&#x8A00;&#x9AD8;&#x6027;&#x80FD;&#x7F16;&#x7A0B;-Delete(GC)</a>&#x4E2D;&#x7ED9;&#x51FA;&#x4E86;&#x4E00;&#x6BB5;&#x793A;&#x4F8B;&#x4EE3;&#x7801;&#xFF1A;</p>
+<pre><code class="lang-go">maxLen := <span class="hljs-built_in">len</span>(a)
+<span class="hljs-keyword">if</span> i &lt; maxLen - <span class="hljs-number">1</span>{
+    <span class="hljs-built_in">copy</span>(a[i:], a[i+<span class="hljs-number">1</span>:]) <span class="hljs-comment">// i+1&#x5230;&#x7ED3;&#x5C3E;&#x7684;&#x5143;&#x7D20;&#x7EDF;&#x4E00;&#x5F80;&#x524D;&#x79FB;&#x52A8;&#x4E00;&#x683C;</span>
+}
+a[maxLen<span class="hljs-number">-1</span>] = <span class="hljs-literal">nil</span> <span class="hljs-comment">// or the zero value of T</span>
+a = a[:maxLen<span class="hljs-number">-1</span>]  <span class="hljs-comment">// &#x6700;&#x540E;&#x4E00;&#x683C;&#x5207;&#x6389;</span>
+</code></pre>
+<p><img src="assets/slice-gc-delete.jpg" alt="slice-gc-delete">
+&#x5B9E;&#x9645;&#x9879;&#x76EE;&#x4E2D;&#xFF0C;&#x56E0;&#x4E3A;<strong>&#x6570;&#x7EC4;&#x7684;&#x5220;&#x9664;&#x65F6;&#x95F4;&#x590D;&#x6742;&#x5EA6;&#x662F; O(n)</strong> &#xFF0C;&#x5982;&#x679C;&#x9047;&#x5230;&#x8981;&#x9891;&#x7E41;&#x5220;&#x9664;&#x7684;&#x573A;&#x666F;&#xFF0C;&#x66F4;&#x597D;&#x7684;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#x662F;&#x66F4;&#x6362;&#x6570;&#x636E;&#x7ED3;&#x6784;&#xFF0C;&#x6BD4;&#x5982; &#x53CC;&#x5411;&#x94FE;&#x8868; <code>list.List</code> &#xFF0C;&#x6240;&#x4EE5;&#x8FD9;&#x4E2A;&#x573A;&#x666F;&#x4EE5;&#x4E86;&#x89E3;&#x4E3A;&#x4E3B;&#x3002;</p>
+<p><strong>&#x60C5;&#x51B5;2</strong>&#xFF1A;&#x957F;&#x65F6;&#x95F4;&#x53EA;&#x4F7F;&#x7528;&#x5207;&#x7247;&#x6570;&#x7EC4;&#x4E2D;&#x5F88;&#x5C0F;&#x7684;&#x7247;&#x6BB5;
+&#x90A3;&#x4E48;&#x5EFA;&#x8BAE;&#x65B0;&#x5EFA;&#x72EC;&#x7ACB;&#x5207;&#x7247;&#xFF0C;&#x590D;&#x5236;&#x9700;&#x8981;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x4F7F;&#x5F97;&#x539F;&#x6570;&#x7EC4;&#x5185;&#x5B58;&#x80FD;&#x88AB;&#x53CA;&#x65F6;&#x56DE;&#x6536;&#xFF0C;&#x964D;&#x4F4E;&#x5185;&#x5B58;&#x5360;&#x7528;&#x3002;</p>
+<ol>
+<li>&#x4E00;&#x6B21;&#x6027;&#x5206;&#x914D;&#x8DB3;&#x591F;&#x7684;&#x5185;&#x5B58;&#xFF0C;&#x907F;&#x514D;&#x52A8;&#x6001;&#x6269;&#x5BB9;&#xFF1A;&#x8001;&#x751F;&#x5E38;&#x8C08;&#xFF0C;&#x4E0D;&#x5728;&#x8D58;&#x8FF0;</li>
+</ol>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="7-实际项目中使用slice都遇到过什么坑.html" class="navigation navigation-prev " aria-label="Previous page: 实际项目中使用slice都遇到过什么坑">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="4-nil切片和空切片的区别.html" class="navigation navigation-next " aria-label="Next page: nil切片和空切片的区别">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"切片的性能优化","level":"1.3.7","depth":2,"next":{"title":"nil切片和空切片的区别","level":"1.3.8","depth":2,"path":"数组和切片/4-nil切片和空切片的区别.md","ref":"数组和切片/4-nil切片和空切片的区别.md","articles":[]},"previous":{"title":"实际项目中使用slice都遇到过什么坑","level":"1.3.6","depth":2,"path":"数组和切片/7-实际项目中使用slice都遇到过什么坑.md","ref":"数组和切片/7-实际项目中使用slice都遇到过什么坑.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"数组和切片/8-切片的性能优化.md","mtime":"2023-05-30T07:42:13.091Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-05-30T07:42:24.307Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

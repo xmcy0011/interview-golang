@@ -1,0 +1,600 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>🐱数组和切片 · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.3">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-highlight/website.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="1-slice底层的实现原理.html" />
+    
+    
+    <link rel="prev" href="../Go语法复习/表达式.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Go面试复习指南
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../Go语法复习/">
+            
+                <a href="../Go语法复习/">
+            
+                    
+                    Go语法复习
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../Go语法复习/程序结构.html">
+            
+                <a href="../Go语法复习/程序结构.html">
+            
+                    
+                    程序结构
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../Go语法复习/表达式.html">
+            
+                <a href="../Go语法复习/表达式.html">
+            
+                    
+                    表达式
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    🐱数组和切片
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="1-slice底层的实现原理.html">
+            
+                <a href="1-slice底层的实现原理.html">
+            
+                    
+                    slice底层的实现原理
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="2-数组和切片有什么区别.html">
+            
+                <a href="2-数组和切片有什么区别.html">
+            
+                    
+                    *数组和切片有什么区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="3-切片是怎样扩容的.html">
+            
+                <a href="3-切片是怎样扩容的.html">
+            
+                    
+                    *切片是怎样扩容的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="5-字面量和make初始化切片有区别吗.html">
+            
+                <a href="5-字面量和make初始化切片有区别吗.html">
+            
+                    
+                    字面量和make初始化切片有区别吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.5" data-path="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                <a href="6-拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗.html">
+            
+                    
+                    拷⻉⼤切⽚⼀定⽐⼩切⽚代价⼤吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.6" data-path="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                <a href="7-实际项目中使用slice都遇到过什么坑.html">
+            
+                    
+                    实际项目中使用slice都遇到过什么坑
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.7" data-path="8-切片的性能优化.html">
+            
+                <a href="8-切片的性能优化.html">
+            
+                    
+                    切片的性能优化
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.8" data-path="4-nil切片和空切片的区别.html">
+            
+                <a href="4-nil切片和空切片的区别.html">
+            
+                    
+                    nil切片和空切片的区别
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" >
+            
+                <span>
+            
+                    
+                    🔗链表
+            
+                </span>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../哈希表/">
+            
+                <a href="../哈希表/">
+            
+                    
+                    📚哈希表
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.5.1" data-path="../哈希表/1-map的底层实现原理是什么.md">
+            
+                <span>
+            
+                    
+                    map的底层实现原理是什么
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.2" data-path="../哈希表/2-如何实现两种 get 操作.md">
+            
+                <span>
+            
+                    
+                    如何实现两种 get 操作
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.3" data-path="../哈希表/3-map 的遍历过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的遍历过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.4" data-path="../哈希表/4-map 的赋值过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的赋值过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.5" data-path="../哈希表/5-map 的删除过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的删除过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.6" data-path="../哈希表/6-map 的扩容过程是怎样的.md">
+            
+                <span>
+            
+                    
+                    map 的扩容过程是怎样的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.7" data-path="../哈希表/7-map 中的 key 为什么是无序的.md">
+            
+                <span>
+            
+                    
+                    map 中的 key 为什么是无序的
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.8" data-path="../哈希表/8-float 类型可以作为 map 的 key 吗.md">
+            
+                <span>
+            
+                    
+                    float 类型可以作为 map 的 key 吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.9" data-path="../9-可以边遍历边删除吗.md">
+            
+                <span>
+            
+                    
+                    可以边遍历边删除吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.10" data-path="../哈希表/10-可以对 map 的元素取地址吗.md">
+            
+                <span>
+            
+                    
+                    可以对 map 的元素取地址吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.11" data-path="../哈希表/11-如何比较两个 map 相等.md">
+            
+                <span>
+            
+                    
+                    如何比较两个 map 相等
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5.12" data-path="../哈希表/12-map 是线程安全的吗.md">
+            
+                <span>
+            
+                    
+                    *map 是线程安全的吗
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >🐱数组和切片</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="&#x6570;&#x7EC4;&#x548C;&#x5207;&#x7247;">&#x6570;&#x7EC4;&#x548C;&#x5207;&#x7247;</h1>
+<h2 id="&#x53C2;&#x8003;&#x8D44;&#x6599;">&#x53C2;&#x8003;&#x8D44;&#x6599;</h2>
+<ul>
+<li><a href="https://github.com/xiaobaiTech/golangFamily" target="_blank">golangFamily</a></li>
+<li><a href="https://www.topgoer.cn/docs/gomianshiti/mianshiti" target="_blank">go&#x8BED;&#x8A00;&#x9762;&#x8BD5;&#x9898;</a></li>
+<li><a href="https://www.topgoer.cn/docs/interview/interview-1dks7os61lo44" target="_blank">&#x5E38;&#x95EE;&#x9762;&#x8BD5;&#x9898;&#x6C47;&#x603B;</a></li>
+<li><a href="https://www.topgoer.cn/docs/golangxiuyang/golangxiuyang-1cmedvjjav3f0" target="_blank">Golang&#x4FEE;&#x517B;&#x4E4B;&#x8DEF;</a></li>
+<li><a href="https://github.com/golang-design/Go-Questions" target="_blank">Go &#x7A0B;&#x5E8F;&#x5458;&#x9762;&#x8BD5;&#x7B14;&#x8BD5;&#x5B9D;&#x5178;</a></li>
+<li><a href="https://learnku.com/articles/33918" target="_blank">Golang slice &#x4ECE;&#x6E90;&#x7801;&#x6765;&#x7406;&#x89E3;</a></li>
+<li><a href="https://www.jianshu.com/p/ac114b58d201" target="_blank">go slice append</a></li>
+<li><a href="https://stackoverflow.com/questions/75348572/go-slices-capacity-increase-rate" target="_blank">Go slices capacity increase rate</a></li>
+<li><a href="http://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/" target="_blank">50 Shades of Go: Traps, Gotchas, and Common Mistakes for New Golang Devs</a></li>
+<li><a href="https://geektutu.com/post/high-performance-go.html" target="_blank">Go &#x8BED;&#x8A00;&#x9AD8;&#x6027;&#x80FD;&#x7F16;&#x7A0B;</a></li>
+<li><a href="https://juejin.cn/post/7091664218864222245" target="_blank">&#x8BE6;&#x89E3;Go slice&#x5E95;&#x5C42;&#x539F;&#x7406;</a></li>
+</ul>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="../Go语法复习/表达式.html" class="navigation navigation-prev " aria-label="Previous page: 表达式">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="1-slice底层的实现原理.html" class="navigation navigation-next " aria-label="Next page: slice底层的实现原理">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"🐱数组和切片","level":"1.3","depth":1,"next":{"title":"slice底层的实现原理","level":"1.3.1","depth":2,"path":"数组和切片/1-slice底层的实现原理.md","ref":"数组和切片/1-slice底层的实现原理.md","articles":[]},"previous":{"title":"表达式","level":"1.2.2","depth":2,"path":"Go语法复习/表达式.md","ref":"Go语法复习/表达式.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"数组和切片/README.md","mtime":"2023-05-30T07:42:13.092Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2023-05-30T07:42:24.307Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
