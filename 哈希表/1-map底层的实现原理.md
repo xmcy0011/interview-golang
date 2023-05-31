@@ -155,7 +155,102 @@ type bmap struct {
 - `values`：值数组，同上
 - `overflow`：哈希冲突单个桶存储的数据超过8个时，动态分配1个桶，如果仍然溢出，无限套娃再分配
 
+### 哈希函数
 
+哈希种子由 `fastrand()` 函数生成，但是哈希函数的实现却是由 runtime 进行注入的：
+
+```go
+type maptype struct {  
+   typ    _type  
+   key    *_type  
+   elem   *_type  
+   bucket *_type // internal type representing a hash bucket  
+   // function for hashing keys (ptr to key, seed) -> hash  
+   hasher     func(unsafe.Pointer, uintptr) uintptr  
+   keysize    uint8  // size of key slot   elemsize   uint8  // size of elem slot   bucketsize uint16 // size of bucket  
+   flags      uint32  
+}
+
+// v := map[k]
+func mapaccess1(t *maptype, h *hmap, key unsafe.Pointer) unsafe.Pointer {  
+   // ...
+   hash := t.hasher(key, uintptr(h.hash0))  
+   //... 
+}
+```
+
+那么 `hasher` 的实现在哪里呢？根据这篇文章 [Hacking Go's Runtime with Generics](https://www.dolthub.com/blog/2022-12-19-maphash/) ，go 自 1.19 以后增加了 `hash/maphash` 包，可以使我们自定义的数据结构来使用 runtime 内置的哈希函数。
+
+它的使用如下（[来源](https://pkg.go.dev/hash/maphash))：
+
+```go
+package main  
+  
+import (  
+   "fmt"  
+   "hash/maphash"
+)  
+  
+func main() {  
+   // The zero Hash value is valid and ready to use; setting an  
+   // initial seed is not necessary.   
+   var h maphash.Hash  
+  
+   // Add a string to the hash, and print the current hash value.  
+   h.WriteString("hello, ")  
+   fmt.Printf("%d\n", h.Sum64())  
+  
+   // Append additional data (in the form of a byte array).  
+   h.Write([]byte{'w', 'o', 'r', 'l', 'd'})  
+   fmt.Printf("%d\n", h.Sum64())  
+  
+   // Reset discards all data previously added to the Hash, without  
+   // changing its seed.   
+   h.Reset()  
+  
+   // Use SetSeed to create a new Hash h2 which will behave  
+   // identically to h.   
+   var h2 maphash.Hash  
+   h2.SetSeed(h.Seed())  
+  
+   h.WriteString("same")  
+   h2.WriteString("same")  
+   fmt.Printf("%d == %d\n", h.Sum64(), h2.Sum64())  
+}
+```
+
+输出：
+
+```bash
+17344016587466449485
+9713887862625155765
+3147414441205831844 == 3147414441205831844
+```
+
+其中 `Sum64` 的实现如下：
+
+```go
+func rthash(ptr *byte, len int, seed uint64) uint64 {  
+   if len == 0 {  
+      return seed  
+   }  
+   // The runtime hasher only works on uintptr. For 64-bit  
+   // architectures, we use the hasher directly. Otherwise,   
+   // we use two parallel hashers on the lower and upper 32 bits.   
+   if unsafe.Sizeof(uintptr(0)) == 8 {  
+      return uint64(runtime_memhash(unsafe.Pointer(ptr), uintptr(seed), uintptr(len)))  
+   }  
+   lo := runtime_memhash(unsafe.Pointer(ptr), uintptr(seed), uintptr(len))  
+   hi := runtime_memhash(unsafe.Pointer(ptr), uintptr(seed>>32), uintptr(len))  
+   return uint64(hi)<<32 | uint64(lo)  
+}  
+  
+//go:linkname runtime_memhash runtime.memhash  
+//go:noescape  
+func runtime_memhash(p unsafe.Pointer, seed, s uintptr) uintptr
+```
+
+我们看到，最终哈希函数由 `runtime_memhash` 实现，至于这个函数的实现在哪里，目前本人没有找到，待后续补充。
 
 ### 遍历过程
 
