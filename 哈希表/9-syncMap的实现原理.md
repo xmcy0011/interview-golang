@@ -4,6 +4,10 @@
 
 ## 简介
 
+原生map不支持并发读写（可并发读），
+
+## 入门
+
 sync.Map 不需要使用 make 或字面量初始化，声明后即可直接使用，如下：
 
 ```go
@@ -205,3 +209,13 @@ sync.Map 将互斥锁内置来实现并发读写，同时又将互斥锁限定�
 由于存在 dirty 向 read 的同步机制，在大多数场合下，数据可以从 read 表中获取，所以当读多写少时，sync.Map 性能优于原生 map。
 
 在写多读少的场景下则不适用，主要是由于写入时， dirtry 表会冗余 read 表的数据，一方面增加了遍历的时间开销，另一方面增加了新对象的创建（主要指 key）频次，从而增加了垃圾回收的负担。
+
+## 附录
+
+以下是对 sync.Map 的 Load/Store/Delete 等常用操作的图解（[来源](http://russellluo.com/2017/06/go-sync-map-diagram.html)）：
+
+![sync-map-all.png](assets/sync-map-all.png)
+
+参考：
+- [图解 Go 新增的并发安全的字典 sync.Map](http://russellluo.com/2017/06/go-sync-map-diagram.html)
+- [Go sync.Map 实现](https://wudaijun.com/2018/02/go-sync-map-implement/)
