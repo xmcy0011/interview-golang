@@ -1,13 +1,13 @@
 # map底层的实现原理
 
-## map简介
+## 简介
 
 [维基百科](https://en.wikipedia.org/wiki/Associative_array)中的定义如下：
 > In computer science, an associative array, map, symbol table, or dictionary is an abstract data type that stores a collection of (key, value) pairs, such that each possible key appears at most once in the collection. In mathematical terms, an associative array is a function with finite domain. It supports 'lookup', 'remove', and 'insert' operations.
 > 
 > The dictionary problem is the classic problem of designing efficient data structures that implement associative arrays. The two major solutions to the dictionary problem are hash tables and search trees. In some cases it is also possible to solve the problem using directly addressed arrays, binary search trees, or other more specialized structures.
 
-简单总结：map（映射）是关联数组（associative array）的别称，是一种存储了 key-value（键值对）元素的集合，同一个key只会出现一次，支持添加、移除和查找等操作。字典问题（dictionary problem）是设计一种能够具备关联数组特性的高效数据结构。解决字典问题的常用方是哈希表和搜索树。
+简单总结：map（映射）是关联数组（associative array）的别称，是一种存储了 key-value（键值对）元素的集合，同一个key只会出现一次，支持添加、移除和查找等操作。字典问题（dictionary problem）是设计一种能够具备关联数组特性的高效数据结构。解决字典问题的常用方法是哈希表和搜索树。
 
 Go 语言中的 map 主要支持如下操作：
 - 构造：m := map[key]value{}
@@ -17,7 +17,7 @@ Go 语言中的 map 主要支持如下操作：
 - 迭代：for k,v := range m
 - 容器大小：len(m)
 
-图解map的2种实现方法：
+实现 `map` 主要有2种数据结构：
 - `哈希表（hash tables）`：利用数组存储键和值，通过哈希函数对输入的key进行计算找到value所在的位置，它的关键在于哈希函数的选择和哈希冲突时的解决办法（Go中使用拉链法解决），最坏情况是O(n)、平均O(1)
 ![map-impl-hashtable](assets/map-impl-hashtable.jpg)
 
@@ -43,9 +43,9 @@ unordered_map<int, int> m2; // 无序，基于数组+哈希函数实现
 
 ### 哈希函数
 
-哈希函数主要是用来解决 key 到 value 的映射问题：这个key对应的value存储在哪里？
+哈希函数主要是用来解决 key 到 value 的映射问题：`这个key对应的value存储在哪里`？
 
-如下图中，cat 经过哈希函数计算后得到一串数字，再对10取余数，得到Bucket的位置，再遍历比较里面的元素最终得到value值：  
+如下图中，`cat` 经过哈希函数计算后得到一串数字，再对10取余数（go使用位运算代替取余），得到Bucket的位置，再遍历比较里面的元素最终得到value值：
 
 ![hash_map_array](assets/hash-map-with-array.jpeg)
 
@@ -66,32 +66,40 @@ unordered_map<int, int> m2; // 无序，基于数组+哈希函数实现
 常用解决哈希冲突的方法是`开放寻址法`和`拉链法`。
 
 开放寻址法的核心思想是依次探测和比较数组中的元素以判断目标键值对是否存在于哈希表中，如果存在，则把元素插入到冲突key的下一个位置，如下图 `key3` 和 `key4` 冲突时被追加到上一个key的末尾：
+
 ![open_addressing](assets/open_addressing.png)
 
 与开放寻址法相比，`拉链法是哈希表最常见的实现方法，大多数的编程语言都用拉链法实现哈希表`，它的实现比较开放地址法稍微复杂一些，但是平均查找的长度也比较短，各个用于存储节点的内存都是动态申请的，可以节省比较多的存储空间。
 
-实现拉链法一般会使用`数组加上链表`，不过一些编程语言会在拉链法的哈希中引入红黑树以优化性能，桶中存放的是一个链表，当出现冲突时，在链表的最末尾进行追加。查找的时候，遍历该链表即可：
+实现拉链法一般会使用 `数组加上链表`，不过一些编程语言会在拉链法的哈希中引入红黑树以优化性能，桶中存放的是一个链表，当出现冲突时，在链表的最末尾进行追加。查找的时候，遍历该链表即可：
 
 ![separate_chaining.png](assets/separate_chaining.png)
 
 更多关于 "开放寻址法" 和 “拉链法”的介绍请参考：《Go语言设计与实现》3.3 哈希表一节。 
 
-## 源码分析
+## 实现原理
 
-> 《Go语言设计与实现》使用的是 go1.15 版本
+在分析源码深入细节之前，先让我们从整体看一下 Go中Map的实现原理。
+
+> PS：本小节内容大部分来自于[《Go专家编程》](https://books.studygolang.com/GoExpertProgramming/chapter01/1.3-map.html)
 
 ### 数据结构
 
-整体结构（参考：[GopherCon 2016: Keith Randall - Inside the Map Implementation](https://www.youtube.com/watch?v=Tl7mi9QmLns)）：
+Go语言中使用哈希表实现 `map` ，一个哈希表可以有很多个节点，称之为 bucket，也就是我们说的桶。每个桶中最多存储8个键值对，当超过时，Go会动态创建桶来存储溢出的数据。每个溢出桶都有一个指向下一个溢出桶的指针，所以构成了一个单向链表，也就是上文所说的拉链法，以解决hash冲突的问题。
+
+下图展示了一个拥有32个bucket的map的整体结构：
+
+```go
+m := make(map[int]string, 128)
+```
+
 ![map-bucket1.png](assets/map-bucket1.jpg)
 
-上图中，实现 map 的结构是 `runtime.hmap` ，hmap是 hashmap 的缩写：
+我们可以看到，`hmap` 代表了哈希表，`[]bmap` 是一个数组，用来存储键值对数据，下面让我们详细看一下 `hamp` 和 `bmap` 的数据结构和字段都代表了什么意思。
 
-- `count`：代表哈希表的长度
-- `B`：代表桶的对数，2^B=32，故B为5
-- `buckets`：是一个指针，指向一个桶数组
-- `oldbuckets`：扩容时使用，指向老的桶
-- `extra.overflow`：保存所有溢出桶的数组指针
+#### map的数据结构
+
+实现 map 的结构是 `runtime.hmap`（hmap是 `hashmap` 的缩写）：
 
 ```go
 // /src/runtime/map.go  
@@ -113,35 +121,32 @@ type hmap struct {
    extra *mapextra  // optional fields  
 }
 
-// mapextra holds fields that are not present on all maps.type 
-type mapextra struct {  
-   // If both key and elem do not contain pointers and are inline, then we mark bucket  
-   // type as containing no pointers. This avoids scanning such maps.  
-   // However, bmap.overflow is a pointer. In order to keep overflow buckets   
-   // alive, we store pointers to all overflow buckets in hmap.extra.overflow and hmap.extra.oldoverflow.   
-   // overflow and oldoverflow are only used if key and elem do not contain pointers.   
-   // overflow contains overflow buckets for hmap.buckets.  
-   // oldoverflow contains overflow buckets for hmap.oldbuckets.  
-   // The indirection allows to store a pointer to the slice in hiter.  
+type mapextra struct {    
+   // 所有的溢出桶
    overflow    *[]*bmap  
    oldoverflow *[]*bmap  
-  
+
    // nextOverflow holds a pointer to a free overflow bucket.  
    nextOverflow *bmap  
 }
 ```
 
-bucket （我们常说的桶）的内存结构如下图：
-![map-bucket2.png](assets/map-bucket2.jpg)
+- `count`：代表哈希表的长度
+- `B`：代表桶的对数，上图中有32个桶，由于2^B=32，故B为5
+- `buckets`：是一个指针，指向一个桶数组
+- `oldbuckets`：扩容时使用，指向老的桶
+- `extra.overflow`：保存所有溢出桶的数组指针
 
-实现该结构的是` runtime.bmap`：
+#### bucket的数据结构
+
+实现 bucket 的数据结构是 `runtime.bmap`：
 
 ```go
 // /src/runtime/map.go
 type bmap struct {  
 	tophash [8]uint8
 
-    // 如下内容由编译器补全，源码：
+    // 非显示定义，通过指针运算访问，手动补全后如下：
     // 1.15：/src/cmd/compile/internal/gc/reflect.go:bmap()
     // 1.20：/src/cmd/compile/internal/reflectdata/reflect.go:MapBucketType()
 	keys [8]keytype
@@ -150,10 +155,15 @@ type bmap struct {
 }
 ```
 
-- `tophash`：哈希键的高8位，通过位运算代替取余，加速定位 key 在桶数组的那个位置   
+- `tophash`：哈希键的高8位，哈希值相同的键（准确的说是哈希值低位相同的键）存入当前bucket时会将哈希值的高位存储在该数组中，以方便后续匹配 
 - `keys`：键数组，最多存储8个键，溢出时在 `overflow` 中动态分配
 - `values`：值数组，同上
-- `overflow`：哈希冲突单个桶存储的数据超过8个时，动态分配1个桶，如果仍然溢出，无限套娃再分配
+- `overflow`：哈希冲突单个桶存储的数据超过8个时，动态分配1个桶，如果仍然溢出，无限套娃再分配，形成单向链表，解决哈希冲突后溢出的问题
+
+> keys、values和overflow都不是显示定义的，而是直接通过指针运算进行访问的
+
+在内存中的结构如下图：
+![map-bucket2.png](assets/map-bucket2.jpg)
 
 ### 哈希函数
 
@@ -252,6 +262,104 @@ func runtime_memhash(p unsafe.Pointer, seed, s uintptr) uintptr
 
 我们看到，最终哈希函数由 `runtime_memhash` 实现，至于这个函数的实现在哪里，目前本人没有找到，待后续补充。
 
+### 哈希冲突解决
+
+当有两个或以上数量的键被哈希到了同一个bucket时，我们称这些键发生了冲突。Go使用 `拉链法` 来解决键冲突。 
+
+由于每个bucket可以存放8个键值对，所以同一个bucket存放超过8个键值对时就会再创建一个键值对，用类似链表的方式将bucket连接起来。
+
+下图展示产生冲突后的map：
+
+![hash-collision.png](assets/hash-collision.png)
+
+overflow指针指向了溢出的桶，如果这个桶也满了，则继续创建下一个溢出桶。
+
+太多的哈希冲突会导致存取效率降低，即时间复杂度由O(1)降低到O(n)，Go语言中的map为了评估哈希冲突的程度，引入了 `负载因子` 的概念，接下来介绍。
+
+### 负载因子
+
+负载因子用于衡量一个哈希表冲突情况，公式为：
+
+```bash
+负载因子 = 键数量/bucket数量
+```
+
+例如，对于一个bucket数量为4，包含4个键值对的哈希表来说，这个哈希表的负载因子为1。
+
+哈希表需要将负载因子控制在合适的大小，超过其阀值需要进行 `rehash`，也即键值对重新组织：
+
+- 哈希因子过小：说明空间利用率低
+- 哈希因子过大：说明冲突严重，存取效率低
+
+每个哈希表的实现对负载因子容忍程度不同，比如Redis实现中负载因子大于1时就会触发rehash，而Go则在在负载因子达到 `6.5` 时才会触发rehash，因为Redis的每个bucket只能存1个键值对，而Go的bucket可能存8个键值对，所以Go可以容忍更高的负载因子。
+
+### 渐进式扩容
+
+#### 前提条件
+
+为了保证访问效率，当新元素将要添加进map时，都会检查是否需要扩容，扩容实际上是以空间换时间的手段。 触发扩容的条件有二个：
+
+1. 负载因子 > 6.5时，也即平均每个bucket存储的键值对达到6.5个。
+2. overflow数量 > 2^15时，也即overflow数量超过 `32768` 时。
+
+#### 增量扩容
+
+当负载因子过大时，就新建一个bucket，新的bucket长度是原来的2倍，然后旧bucket数据搬迁到新的bucket。 考虑到如果map存储了数以亿计的key-value，一次性搬迁将会造成比较大的延时，Go采用逐步搬迁策略，即每次访问map时都会触发一次搬迁，每次搬迁2个键值对。
+
+下图展示了包含一个bucket满载的map(为了描述方便，图中bucket省略了value区域)：
+![map-growing1.png](assets/map-growing1.png)
+当前map存储了7个键值对，只有1个bucket。此地负载因子为7。再次插入数据时将会触发扩容操作，扩容之后再将新插入键写入新的bucket。
+
+当第8个键值对插入时，将会触发扩容，扩容后示意图如下：
+
+![map-growing2.png](assets/map-growing2.png)
+
+hmap数据结构中oldbuckets成员指身原bucket，而buckets指向了新申请的bucket。新的键值对被插入新的bucket中。 后续对map的访问操作会触发迁移，将oldbuckets中的键值对逐步的搬迁过来。当oldbuckets中的键值对全部搬迁完毕后，删除oldbuckets。
+
+搬迁完成后的示意图如下：
+
+![map-growing3.png](assets/map-growing3.png)
+
+数据搬迁过程中原bucket中的键值对将存在于新bucket的前面，新插入的键值对将存在于新bucket的后面。 实际搬迁过程中比较复杂，将在后续源码分析中详细介绍。
+
+#### 等量扩容
+
+所谓等量扩容，实际上并不是扩大容量，buckets数量不变，重新做一遍类似增量扩容的搬迁动作，把松散的键值对重新排列一次，以使bucket的使用率更高，进而保证更快的存取。 在极端场景下，比如不断的增删，而键值对正好集中在一小部分的bucket，这样会造成overflow的bucket数量增多，但负载因子又不高，从而无法执行增量搬迁的情况，如下图所示：
+
+![map-growing4.png](assets/map-growing4.png)
+
+上图可见，overflow的buckt中大部分是空的，访问效率会很差。此时进行一次等量扩容，即buckets数量不变，经过重新组织后overflow的bucket数量会减少，即节省了空间又会提高访问效率。
+
+### 查找过程
+
+查找过程如下：
+
+- 跟据key值算出哈希值
+- 取哈希值低位与hmpa.B取模确定bucket位置
+- 取哈希值高位在tophash数组中查询
+- 如果tophash[i]中存储值也哈希值相等，则去找到该bucket中的key值进行比较
+- 当前bucket没有找到，则继续从下个overflow的bucket中查找。
+- 如果当前处于搬迁过程，则优先从oldbuckets查找
+
+> 注：如果查找不到，也不会返回空值，而是返回相应类型的0值。
+
+### 插入过程
+
+新员素插入过程如下：
+
+1. 跟据key值算出哈希值
+2. 取哈希值低位与hmap.B取模确定bucket位置
+3. 查找该key是否已经存在，如果存在则直接更新值
+4. 如果没找到将key，将key插入
+
+## 源码解析
+
+> 《Go语言设计与实现》使用的是 go1.15 版本
+
+### 扩容过程
+
+请参考：[https://golang.design/go-questions/map/delete/](https://golang.design/go-questions/map/delete/)
+
 ### 遍历过程
 
 请参考：[https://golang.design/go-questions/map/range/](https://golang.design/go-questions/map/range/)
@@ -261,10 +369,6 @@ func runtime_memhash(p unsafe.Pointer, seed, s uintptr) uintptr
 请参考：[https://golang.design/go-questions/map/assign/](https://golang.design/go-questions/map/assign/)
 
 ### 删除过程
-
-请参考：[https://golang.design/go-questions/map/delete/](https://golang.design/go-questions/map/delete/)
-
-### 扩容过程
 
 请参考：[https://golang.design/go-questions/map/delete/](https://golang.design/go-questions/map/delete/)
 

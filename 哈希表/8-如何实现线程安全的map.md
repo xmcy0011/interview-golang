@@ -71,6 +71,7 @@ type mapInterface interface {
 func (m *Map) Range(f func(key, value any) bool) {  
     // 复制 key
    if read.amended {  
+	  m.mu.Lock()
       read = m.loadReadOnly()  
       if read.amended {  
          read = readOnly{m: m.dirty}  

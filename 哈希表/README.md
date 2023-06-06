@@ -1,9 +1,14 @@
 # 哈希表
 
+## 面经
+
+* [哈希表面经](哈希表/0-哈希表面经.md)
+
 ## 参考
 
 - [Go 程序员面试笔试宝典](https://golang.design/go-questions)
 - [《Go语言设计与实现》](https://draveness.me/golang/)
+- [《Go专家编程》](https://books.studygolang.com/GoExpertProgramming/)
 - 《Go语言圣经》
 - 《Go程序设计语言》
 - [Data Structures in JavaScript: Arrays, HashMaps, and Lists](https://adrianmejia.com/data-structures-time-complexity-for-beginners-arrays-hashmaps-linked-lists-stacks-queues-tutorial/#HashMap-vs-Array)
